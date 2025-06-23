@@ -1,9 +1,11 @@
 import { Link, Outlet, useLocation } from 'react-router-dom';
 import { useState } from 'react';
+import { useAuth } from '../context/AuthContext';
 
 export default function DashboardLayout() {
     const [defOpen, setDefOpen] = useState(false);
     const location = useLocation();
+    const { auth, logout } = useAuth();
 
     return (
         <div style={{ display: 'flex', height: '100vh', fontFamily: 'sans-serif' }}>
@@ -26,16 +28,21 @@ export default function DashboardLayout() {
 
                         {defOpen && (
                             <div style={{ paddingLeft: 12, display: 'flex', flexDirection: 'column', gap: 6 }}>
-                                <Link to="/dashboard/personales" style={navLink(location.pathname === '/dashboard/personales')}>
-                                    👤 Personales
-                                </Link>
-                                <Link to="/dashboard/cargos" style={navLink(location.pathname === '/dashboard/cargos')}>
-                                    📌 Cargos
-                                </Link>
-
-                                <Link to="/dashboard/rubros" style={navLink(location.pathname === '/dashboard/rubros')}>
-                                    📋 Rubros/Conceptos
-                                </Link>
+                                {(auth.role === 'Administrador' || auth.role === 'Gerente/RRHH' || auth.role === 'Asistente de RRHH') && (
+                                    <Link to="/dashboard/personales" style={navLink(location.pathname === '/dashboard/personales')}>
+                                        👤 Personales
+                                    </Link>
+                                )}
+                                {(auth.role === 'Administrador' || auth.role === 'Asistente de RRHH') && (
+                                    <Link to="/dashboard/cargos" style={navLink(location.pathname === '/dashboard/cargos')}>
+                                        📌 Cargos
+                                    </Link>
+                                )}
+                                {auth.role === 'Administrador' && (
+                                    <Link to="/dashboard/rubros" style={navLink(location.pathname === '/dashboard/rubros')}>
+                                        📋 Rubros/Conceptos
+                                    </Link>
+                                )}
 
                             </div>
                         )}
@@ -48,7 +55,7 @@ export default function DashboardLayout() {
                 <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 20 }}>
                     <button
                         onClick={() => {
-                            localStorage.removeItem('token');
+                            logout();
                             window.location.href = '/';
                         }}
                         style={{
