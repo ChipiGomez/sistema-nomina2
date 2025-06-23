@@ -1,11 +1,13 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useAuth, type Role } from '../context/AuthContext';
 
 export default function Login() {
     const [user, setUser] = useState('');
     const [clave, setClave] = useState('');
     const [mensaje, setMensaje] = useState('');
     const navigate = useNavigate();
+    const { login } = useAuth();
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -21,7 +23,8 @@ export default function Login() {
             const data = await res.json();
 
             if (data.estado === 1) {
-                localStorage.setItem('token', data.token);
+                const rol: Role = (data.rol || data.role) as Role;
+                login(data.token, rol);
                 navigate('/dashboard/');
             } else {
                 setMensaje(data.mensaje || 'Credenciales incorrectas');

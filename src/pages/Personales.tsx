@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import axios from 'axios';
+import { filterEmployees } from '../utils/employee.js';
 
 export default function Personales() {
     const [personas, setPersonas] = useState([]);
@@ -57,11 +58,10 @@ export default function Personales() {
             .catch(err => console.error("Error al cargar países:", err));
     };
 
-    const personasFiltradas = personas.filter((p: any) => {
-        const coincideNombre = p.nombre.toLowerCase().includes(filtroNombre.toLowerCase());
-        const coincideApellido = p.apellido.toLowerCase().includes(filtroApellido.toLowerCase());
-        const coincideDocumento = (p.documento || '').includes(filtroDocumento);
-        return coincideNombre && coincideApellido && coincideDocumento;
+    const personasFiltradas = filterEmployees(personas as any, {
+        nombre: filtroNombre,
+        apellido: filtroApellido,
+        documento: filtroDocumento,
     });
 
     const handleGuardar = async () => {
